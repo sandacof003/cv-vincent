@@ -42,13 +42,36 @@ const LandingPage = () => {
     }
   };
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText('vincentleemarvin@gmail.com');
-    toast({
-      title: "✅ Email copied to clipboard!",
-      description: "vincentleemarvin@gmail.com",
-      duration: 3000,
-    });
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText('vincentleemarvin@gmail.com');
+      toast({
+        title: "✅ Email copied to clipboard!",
+        description: "vincentleemarvin@gmail.com",
+        duration: 3000,
+      });
+    } catch (err) {
+      // Fallback for when clipboard API is not available
+      const textArea = document.createElement('textarea');
+      textArea.value = 'vincentleemarvin@gmail.com';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast({
+          title: "✅ Email copied to clipboard!",
+          description: "vincentleemarvin@gmail.com",
+          duration: 3000,
+        });
+      } catch (fallbackErr) {
+        toast({
+          title: "📋 Copy Email",
+          description: "vincentleemarvin@gmail.com - Please copy manually",
+          duration: 5000,
+        });
+      }
+      document.body.removeChild(textArea);
+    }
   };
 
   const openMailto = () => {

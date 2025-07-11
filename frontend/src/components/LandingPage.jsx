@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Switch } from './ui/switch';
+import { useToast } from '../hooks/use-toast';
 import { 
   Mail, 
   Linkedin, 
-  Moon, 
-  Sun, 
   MapPin, 
   Calendar,
   ExternalLink,
@@ -20,17 +18,22 @@ import {
 } from 'lucide-react';
 
 const LandingPage = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const [activeSection, setActiveSection] = useState('hero');
+  const [isFullSiteVisible, setIsFullSiteVisible] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Apply dark mode class to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+    // Apply dark mode permanently
+    document.documentElement.classList.add('dark');
+  }, []);
+
+  const handleLearnMore = () => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      setIsFullSiteVisible(true);
+      setIsAnimating(false);
+    }, 800);
+  };
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -41,21 +44,78 @@ const LandingPage = () => {
 
   const copyEmail = () => {
     navigator.clipboard.writeText('vincentleemarvin@gmail.com');
-    // You could add a toast notification here
+    toast({
+      title: "✅ Email copied to clipboard!",
+      description: "vincentleemarvin@gmail.com",
+      duration: 3000,
+    });
   };
 
   const openMailto = () => {
     window.open('mailto:vincentleemarvin@gmail.com', '_blank');
   };
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
+  // Skills data with updated comprehensive lists
+  const skillsData = {
+    programming: [
+      'Java', 'JavaScript', 'SQL', 'HTML', 'CSS', 'Excel VBA', 'PHP (Laravel)', 'Kotlin'
+    ],
+    testing: [
+      'Playwright', 'Katalon', 'Selenium', 'Appium', 'Cypress', 'JUnit', 'TestNG', 
+      'Cucumber', 'Postman', 'BrowserStack', 'TestProject'
+    ],
+    tools: [
+      'Git', 'GitHub', 'Bitbucket', 'Jira', 'Jenkins', 'Docker', 'Firebase', 
+      'Confluence', 'VS Code', 'IntelliJ IDEA', 'Android Studio'
+    ]
   };
+
+  if (!isFullSiteVisible) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-slate-950 dark:via-purple-950 dark:to-slate-950 flex items-center justify-center transition-all duration-300">
+        <div className={`container mx-auto max-w-6xl px-6 text-center transition-all duration-800 ${isAnimating ? 'transform scale-75 opacity-0' : ''}`}>
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight">
+                Vincent Lee 
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+                  Marvin
+                </span>
+              </h1>
+              <p className="text-2xl md:text-3xl text-white/80 font-light">
+                Senior QA Automation Engineer
+              </p>
+              <p className="text-lg text-white/60 max-w-2xl mx-auto">
+                Building robust test automation solutions with 4+ years of experience across multiple domains
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={() => scrollToSection('contact')}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+              >
+                Let's Talk
+                <MessageSquare className="ml-2 h-5 w-5" />
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={handleLearnMore}
+                className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300"
+              >
+                Learn More
+                <User className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-slate-950 dark:via-purple-950 dark:to-slate-950 transition-all duration-300">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10">
+      {/* Navigation - Now visible after animation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/20 backdrop-blur-md border-b border-white/10 animate-in fade-in duration-500">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="text-2xl font-bold text-white">
@@ -92,32 +152,23 @@ const LandingPage = () => {
               >
                 Contact
               </button>
-              <div className="flex items-center space-x-2">
-                <Sun className="h-4 w-4 text-yellow-400" />
-                <Switch 
-                  checked={isDarkMode} 
-                  onCheckedChange={toggleTheme}
-                  className="data-[state=checked]:bg-purple-600"
-                />
-                <Moon className="h-4 w-4 text-slate-300" />
-              </div>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section id="hero" className="pt-20 pb-32 px-6">
+      {/* Hero Section - Modified for full site view */}
+      <section id="hero" className="pt-20 pb-16 px-6 animate-in fade-in duration-700">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center space-y-8">
-            <div className="space-y-4">
-              <h1 className="text-6xl md:text-8xl font-bold text-white leading-tight">
+          <div className="text-center space-y-6">
+            <div className="space-y-3">
+              <h1 className="text-5xl md:text-6xl font-bold text-white leading-tight">
                 Vincent Lee 
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
                   Marvin
                 </span>
               </h1>
-              <p className="text-2xl md:text-3xl text-white/80 font-light">
+              <p className="text-xl md:text-2xl text-white/80 font-light">
                 Senior QA Automation Engineer
               </p>
               <p className="text-lg text-white/60 max-w-2xl mx-auto">
@@ -127,7 +178,7 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={() => scrollToSection('contact')}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300 transform hover:scale-105"
               >
                 Let's Talk
                 <MessageSquare className="ml-2 h-5 w-5" />
@@ -135,9 +186,9 @@ const LandingPage = () => {
               <Button 
                 variant="outline"
                 onClick={() => scrollToSection('about')}
-                className="border-white/20 text-white hover:bg-white/10 px-8 py-6 text-lg font-semibold rounded-full transition-all duration-300"
+                className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold rounded-full transition-all duration-300"
               >
-                Learn More
+                About Me
                 <User className="ml-2 h-5 w-5" />
               </Button>
             </div>
@@ -146,7 +197,7 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 px-6">
+      <section id="about" className="py-20 px-6 animate-in fade-in duration-700 delay-100">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -197,8 +248,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Skills Section */}
-      <section id="skills" className="py-20 px-6">
+      {/* Skills Section - Updated with comprehensive lists */}
+      <section id="skills" className="py-20 px-6 animate-in fade-in duration-700 delay-200">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">Skills & Tools</h2>
@@ -209,14 +260,16 @@ const LandingPage = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Code className="mr-2 h-5 w-5 text-purple-400" />
-                  Programming
+                  Programming Languages
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">Java</Badge>
-                  <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">JavaScript</Badge>
-                  <Badge className="bg-purple-600/20 text-purple-300 border-purple-600/30">Excel VBA</Badge>
+                  {skillsData.programming.map((skill, index) => (
+                    <Badge key={index} className="bg-purple-600/20 text-purple-300 border-purple-600/30 hover:bg-purple-600/30 transition-colors">
+                      {skill}
+                    </Badge>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -230,10 +283,11 @@ const LandingPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-pink-600/20 text-pink-300 border-pink-600/30">Playwright</Badge>
-                  <Badge className="bg-pink-600/20 text-pink-300 border-pink-600/30">Katalon</Badge>
-                  <Badge className="bg-pink-600/20 text-pink-300 border-pink-600/30">Cucumber</Badge>
-                  <Badge className="bg-pink-600/20 text-pink-300 border-pink-600/30">Postman</Badge>
+                  {skillsData.testing.map((skill, index) => (
+                    <Badge key={index} className="bg-pink-600/20 text-pink-300 border-pink-600/30 hover:bg-pink-600/30 transition-colors">
+                      {skill}
+                    </Badge>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -247,10 +301,11 @@ const LandingPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30">Git</Badge>
-                  <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30">Jira</Badge>
-                  <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30">BrowserStack</Badge>
-                  <Badge className="bg-blue-600/20 text-blue-300 border-blue-600/30">Bitbucket</Badge>
+                  {skillsData.tools.map((skill, index) => (
+                    <Badge key={index} className="bg-blue-600/20 text-blue-300 border-blue-600/30 hover:bg-blue-600/30 transition-colors">
+                      {skill}
+                    </Badge>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -259,7 +314,7 @@ const LandingPage = () => {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-20 px-6">
+      <section id="projects" className="py-20 px-6 animate-in fade-in duration-700 delay-300">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">Featured Projects</h2>
@@ -346,7 +401,7 @@ const LandingPage = () => {
       </section>
 
       {/* Timeline Section */}
-      <section id="timeline" className="py-20 px-6">
+      <section id="timeline" className="py-20 px-6 animate-in fade-in duration-700 delay-400">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">Work Timeline</h2>
@@ -430,7 +485,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 animate-in fade-in duration-700 delay-500">
         <div className="container mx-auto max-w-4xl text-center">
           <Card className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-600/30 backdrop-blur-sm">
             <CardContent className="p-12">
@@ -454,7 +509,7 @@ const LandingPage = () => {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 px-6">
+      <section id="contact" className="py-20 px-6 animate-in fade-in duration-700 delay-600">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">Let's Connect</h2>
@@ -506,7 +561,7 @@ const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 border-t border-white/10">
+      <footer className="py-12 px-6 border-t border-white/10 animate-in fade-in duration-700 delay-700">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="text-white/60 mb-4 md:mb-0">
@@ -519,15 +574,6 @@ const LandingPage = () => {
               >
                 Back to Top
               </button>
-              <div className="flex items-center space-x-2">
-                <Sun className="h-4 w-4 text-yellow-400" />
-                <Switch 
-                  checked={isDarkMode} 
-                  onCheckedChange={toggleTheme}
-                  className="data-[state=checked]:bg-purple-600"
-                />
-                <Moon className="h-4 w-4 text-slate-300" />
-              </div>
             </div>
           </div>
         </div>
